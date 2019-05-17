@@ -1,5 +1,6 @@
 package com.getkeepsafe.taptargetviewsample;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Rect;
 import android.graphics.Typeface;
@@ -48,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
     final TapTargetSequence sequence = new TapTargetSequence(this)
         .targets(
             // This tap target will target the back button, we just need to pass its containing toolbar
-            TapTarget.forToolbarNavigationIcon(toolbar, "This is the back button", sassyDesc).id(1),
+            TapTarget.forToolbarNavigationIcon(toolbar, "This is the back button", sassyDesc).id(1).drawCardShadow(true),
             // Likewise, this tap target will target the search button
             TapTarget.forToolbarMenuItem(toolbar, R.id.search, "This is a search icon", "As you can see, it has gotten pretty dark around here...")
                 .dimColor(android.R.color.black)
@@ -56,14 +57,16 @@ public class MainActivity extends AppCompatActivity {
                 .targetCircleColor(android.R.color.black)
                 .transparentTarget(true)
                 .textColor(android.R.color.black)
-                .id(2),
+                    .revealDuration(250)
+                    .pulseDuration(1000)
+                .id(2).drawCardShadow(true),
             // You can also target the overflow button in your toolbar
-            TapTarget.forToolbarOverflow(toolbar, "This will show more options", "But they're not useful :(").id(3),
+            TapTarget.forToolbarOverflow(toolbar, "This will show more options", "But they're not useful :(").id(3).drawCardShadow(true),
             // This tap target will target our droid buddy at the given target rect
             TapTarget.forBounds(droidTarget, "Oh look!", "You can point to any part of the screen. You also can't cancel this one!")
                 .cancelable(false)
                 .icon(droid)
-                .id(4)
+                .id(4).drawCardShadow(true)
         )
         .listener(new TapTargetSequence.Listener() {
           // This listener will tell us when interesting(tm) events happen in regards
@@ -86,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
                 .setPositiveButton("Oops", null).show();
             TapTargetView.showFor(dialog,
                 TapTarget.forView(dialog.getButton(DialogInterface.BUTTON_POSITIVE), "Uh oh!", "You canceled the sequence at step " + lastTarget.id())
-                    .cancelable(false)
+                    .cancelable(false).drawCardShadow(true)
                     .tintTarget(false), new TapTargetView.Listener() {
                   @Override
                   public void onTargetClick(TapTargetView view) {
@@ -98,13 +101,20 @@ public class MainActivity extends AppCompatActivity {
         });
 
     // You don't always need a sequence, and for that there's a single time tap target
-    final SpannableString spannedDesc = new SpannableString("This is the sample app for TapTargetView");
+    final SpannableString spannedDesc = new SpannableString("منوی چپ منوی را میتوانید در هر زمان باز کنید شما می توانید تنظیمات خود را تغییر دهید، محتوای خود را آپلود کنید و غیره. \\n لطفا شرایط استفاده و سیاست حفظ حریم خصوصی را بخوانید.\\n در هر صورت، برای ارسال بازخورد احساس راحتی کنید.");
     spannedDesc.setSpan(new UnderlineSpan(), spannedDesc.length() - "TapTargetView".length(), spannedDesc.length(), 0);
     TapTargetView.showFor(this, TapTarget.forView(findViewById(R.id.fab), "Hello, world!", spannedDesc)
-        .cancelable(false)
-        .drawShadow(true)
-        .titleTextDimen(R.dimen.title_text_size)
-        .tintTarget(false), new TapTargetView.Listener() {
+            .cancelable(true)
+            .showDebugInfo(true)
+            .dimColor(android.R.color.black)
+            .drawShadow(true)
+            .drawCardShadow(true)
+                            .outerCircleColor(android.R.color.transparent)
+                            .outerCircleAlpha(0)
+            .cardColor(android.R.color.white)
+                            .targetCircleColor(R.color.colorAccent)
+            .transparentTarget(true)
+            .textColor(android.R.color.black), new TapTargetView.Listener() {
       @Override
       public void onTargetClick(TapTargetView view) {
         super.onTargetClick(view);
@@ -123,5 +133,9 @@ public class MainActivity extends AppCompatActivity {
         Log.d("TapTargetViewSample", "You dismissed me :(");
       }
     });
+  }
+
+  @Override protected void attachBaseContext(final Context newBase) {
+    super.attachBaseContext(SampleApplication.setupRtl(newBase));
   }
 }
